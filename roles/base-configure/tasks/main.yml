@@ -1,0 +1,98 @@
+- name: set hostname from entry in hosts file
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: copy inputrc to user directory
+  copy:
+    src: ../files/.inputrc
+    dest: /home/ubuntu/.inputrc
+    owner: ubuntu
+    group: ubuntu
+    mode: "0644"
+  # loop:
+  #   - /home/ubuntu
+  #   - /root
+
+- name: copy inputrc to root directory
+  copy:
+    src: ../files/.inputrc
+    dest: /root/.inputrc
+    owner: root
+    group: root
+    mode: "0644" 
+
+- name: copy boot ops to enable cgroups
+  copy:
+    src: ../files/nobtcmd.txt
+    dest: /boot/firmware/nobtcmd.txt
+    owner: root
+    group: root
+    mode: "0755" 
+
+- name: update package cache
+  apt:  
+    update_cache: yes
+
+# - name: install docker
+#   package:
+#     name: docker
+#     state: present
+
+- name: Install required packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop:
+      - apt-transport-https
+      # - btrfs-tools
+      - socat
+      - libseccomp2
+      - util-linux
+      - tar
+      - unzip
+
+- name: "Get Containerd"
+  unarchive:
+    src: "{{ containerd_download_url }}"
+    dest: "/"
+    remote_src: yes
+
+# - name: install docker
+#   shell: "curl -sSL get.docker.com | sh"
+
+- name: Install docker
+  snap:
+    name:
+      - docker
+
+- name: "Add gpg key to fetch k8s packages"
+  apt_key:
+    url: "{{ kubernetes_gpg_key }}"
+    state: present
+
+# - name: adding ubuntu user to docker group
+#   user:
+#     name: ubuntu
+#     groups:
+#       - docker
+#     append: yes
+
+# - name: "Install kubelet, kubeadm, kubectl (Ubuntu)"
+#   apt: 
+#     name: "{{item}}"
+#     state: present
+#   loop:
+#     - kubelet
+#     - kubeadm
+#     - kubectl
+
+# - name: "Start Containerd"
+#   systemd:
+#     name: containerd
+#     daemon_reload: yes
+#     state: restarted
+#     enabled: yes
+
+# - name: Unconditionally reboot the machine with all defaults
+#   reboot:
+#     - pre_reboot_delay: 10

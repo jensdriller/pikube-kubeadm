@@ -12,7 +12,7 @@ This project leverages kubeadm and Ansible to provision a kubernetes cluster on 
 ---
 ## Getting Started
 
-### Install Ansible
+### Install Ansible (v2.8 or newer)
   - [Ubuntu  install docs](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-ubuntu)
   - Mac: `brew install ansible`
 
@@ -22,7 +22,7 @@ git clone https://github.com/jensdriller/pikube-via-kubeadm.git
 ```
 
 ### Update `ansible.cfg`
-    - 
+    - Set the correct path to the location of the repo (I placed mine under ~/workspace)
 
 ---
 ## Set up each raspberry pi
