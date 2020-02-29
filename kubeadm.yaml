@@ -1,0 +1,20 @@
+- name: Configure master components
+  hosts: master
+  become: yes
+  become_user: root
+  gather_facts: true
+  roles:
+    - role: kubeadm/master
+
+- name: join worker nodes
+  hosts: workers
+  become: yes
+  become_user: root
+  gather_facts: true
+  pre_tasks:
+    - name: store join command
+      command: "kubeadm token create --print-join-command"
+      delegate_to: "{{ groups['master'][0] }}"
+      register: join_output
+  roles:
+    - role: kubeadm/worker
