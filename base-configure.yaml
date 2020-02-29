@@ -1,7 +1,0 @@
-- name: Configure board with base packages and configs
-  hosts: all_servers
-  become: yes
-  become_user: root
-  gather_facts: true
-  roles:
-    - { role: base-configure }

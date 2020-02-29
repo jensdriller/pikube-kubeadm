@@ -1,6 +1,0 @@
-"\e[A": history-search-backward
-"\e[B": history-search-forward
-"\e[C": forward-char
-"\e[D": backward-char
-"\e[1;5C": forward-word   # ctrl + right
-"\e[1;5D": backward-word  # ctrl + left 
