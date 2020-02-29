@@ -135,6 +135,7 @@
     path: "{{ item }}"
     state: absent
   loop:
+    - /root/.kube/config
     - /var/lib/etcd
     - /var/lib/kubelet
     - /etc/kuberentes
