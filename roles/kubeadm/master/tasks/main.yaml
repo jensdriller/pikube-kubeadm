@@ -1,0 +1,68 @@
+# kubeadm init --pod-network-cidr=10.17.0.0/16 --service-cidr=10.18.0.0/24 --service-dns-domain=cluster.local
+# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# kubeadm join 10.1.2.1:6443 --token mf6m14.bcg03u44em42reb4 \
+#    --discovery-token-ca-cert-hash sha256:3bf3e8f6e29814bf4eb39db5780ea32d672d828f3bf02d7de1ba190c260d32d4
+
+- name: Check for existing kube-config
+  stat: 
+    path: /root/.kube/config
+  register: p
+
+- name: initalize cluster if kubeconfig is missing
+  block: 
+  - name: Initalize cluster
+    shell:
+      cmd: "kubeadm init --pod-network-cidr={{ pod_cidr }} --service-cidr={{ service_cidr }}"
+
+  - name: Create kube config dir
+    file:
+      path: "/root/.kube"
+      state: directory
+      mode: '0755'
+
+  - name: copy admin conf to /root/.kube/config
+    copy:
+      src: /etc/kubernetes/admin.conf
+      dest: /root/.kube/config
+      owner: root
+      group: root
+      remote_src: yes
+      mode: '0400'
+  when: p.stat.exists == false
+
+- name: Create flannel tmp dir
+  file:
+    path: "/tmp/flannel"
+    state: directory
+    mode: '0755'
+
+- name: copy flannel configs to host
+  template:
+    src: "../templates/flannel-{{ item }}.j2"
+    dest: "/tmp/flannel/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - cm.yaml
+    - cr.yaml
+    - crb.yaml
+    - sa.yaml
+    - ds-arm.yaml
+
+# - name: Create a Service object by reading the definition from a file
+#   k8s:
+#     kubeconfig: /root/.kube/config
+#     state: present
+#     src: "/tmp/flannel/{{ item }}"
+#   loop:
+#     - cm.yaml
+#     - cr.yaml
+#     - crb.yaml
+#     - sa.yaml
+#     - ds-arm.yaml
+
+- name: deploy flannel components
+  shell:
+    cmd: "kubectl apply -f /tmp/flannel/"
