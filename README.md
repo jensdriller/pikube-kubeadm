@@ -21,7 +21,7 @@ This project leverages kubeadm and Ansible to provision a kubernetes cluster on 
 ### Clone the repo
 
 ```
-git clone https://github.com/jensdriller/pikube-via-kubeadm.git
+git clone https://github.com/jensdriller/pikube-kubeadm.git
 ```
 
 ### Update `ansible.cfg`
